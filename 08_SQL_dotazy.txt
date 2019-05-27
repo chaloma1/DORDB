@@ -1,0 +1,74 @@
+-- 1. Všechny zamìstnanci pracující v Hradci Králové
+
+Select * 
+FROM Zamestnanci z
+JOIN Sklady s
+ON z.ID_Skladu = s.ID_Skladu AND s.Mesto LIKE 'Hradec%';
+
+
+-- 2. Platový prùmìr všech zamìstnancù
+
+Select AVG(Plat)
+FROM Zamestnanci 
+WHERE Plat IS NOT NULL;
+
+
+-- 2.1 Všechny zamìstnance a pozici s vìtším než prùmìrným platem
+
+SELECT z.ID_Zamestnance, z.Jmeno, z.Prijmeni, z.Plat, p.Nazev, p.Popis
+FROM Zamestnanci z
+JOIN Pozice p ON z.ID_Pozice = p.ID_Pozice
+WHERE z.Plat is not null and z.Plat > (Select AVG(Plat) From Zamestnanci);
+
+-- 2.2 Poèet zamìstnancù s vìtšším než prùmìrným platem
+
+SELECT COUNT(*) From zamestnanci where plat > (Select AVG(Plat) FROM Zamestnanci);
+
+
+
+-- 3. Zboží, které je nejvícekrát ve skladu v Hradci Králové
+
+SELECT * FROM
+(SELECT * FROM Zbozi z 
+JOIN Zbozi_skladu zs ON z.ID_Zbozi = zs.ID_Zbozi
+JOIN Sklady s ON zs.ID_Skladu = s.ID_Skladu
+WHERE s.Mesto like 'Hradec%'
+ORDER BY zs.mnozstvi DESC)
+WHERE ROWNUM = 1;
+
+-- 4. Celková cena zboží ve skladu v Hradci Králové
+
+SELECT s.ID_Skladu, s.Mesto, SUM(z.Cena * zs.Mnozstvi) as Celkova_hodnota_skladu
+FROM Zbozi z
+JOIN Zbozi_skladu zs ON z.ID_Zbozi = zs.ID_Zbozi
+JOIN SKlady s ON zs.ID_Skladu = s.ID_Skladu
+WHERE s.MEsto like 'Hradec%'
+GROUP BY(s.ID_Skladu, s.Mesto);
+
+
+-- 4.1 Celková cena zboží z každého skladu
+
+SELECT s.ID_Skladu, s.Mesto, SUM(z.Cena * zs.Mnozstvi) as Celkova_hodnota_skladu
+FROM Zbozi z
+JOIN Zbozi_skladu zs ON z.ID_Zbozi = zs.ID_Zbozi
+JOIN Sklady s ON zs.ID_Skladu = s.ID_Skladu
+GROUP BY(s.ID_Skladu, s.Mesto)
+ORDER BY Celkova_hodnota_skladu DESC;
+
+-- 4.2 Poèet skladù ve kterých není žádné zboží
+
+SELECT COUNT(*) FROM Sklady s
+WHERE s.ID_Skladu not in (SELECT ID_Skladu FROM Zbozi_skladu);
+
+
+-- 5. Zboží s nejvíce parametrama
+
+
+SELECT * FROM
+(SELECT COUNT(p.ID_Parametru) as pocet_parametru, z.ID_Zbozi, z.nazev
+FROM Zbozi z
+JOIN Parametry_zbozi p ON z.ID_Zbozi = p.ID_Zbozi
+WHERE z.ID_Zbozi = p.ID_Zbozi
+GROUP BY z.ID_Zbozi, z.Nazev
+ORDER BY COUNT(p.ID_Parametru) DESC)
+WHERE rownum <= 10;

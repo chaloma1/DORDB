@@ -1,0 +1,16 @@
+// Tabulka - Zbozi ( Cena nesmí být záporná )
+
+INSERT INTO Zbozi(ID_Zbozi, Cena, Nazev, Kategorie, Popis) VALUES (seq_Zbozi.nextval, -3000, 'Test','Popis zbozi');
+
+// Tabulka Zbozi_skladu ( mnozstvi nesmí být záporné )
+
+INSERT INTO Zbozi_skladu(ID_Skladu, ID_Zbozi, mnozstvi) values (1,1,-5);
+
+// Tabulka - Zamestnanci ( Plat nesmí být záporný )
+
+INSERT INTO Zamestnanci(ID_Zamestnance, Jmeno, Prijmeni, Telefon, Plat) values (seq_Zamestnanci.nextval, 'Test','Test','111 222 333', -30000);
+
+// Tabulka Parametry_zbozi ( Nemùžu jednomu zboží dát více stejných parametrù )
+
+INSERT INTO Parametry_zbozi(ID_Zbozi, ID_Parametru, Hodnota) VALUES (1,1,'10GB');
+INSERT INTO Parametry_zbozi(ID_Zbozi, ID_Parametru, Hodnota) VALUES (1,1,'50GB');

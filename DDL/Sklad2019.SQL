@@ -1,0 +1,125 @@
+CREATE TABLE Parametry_zbozi
+(
+	ID_Zbozi      NUMBER(38) NOT NULL,
+	ID_Parametru  NUMBER(38) NOT NULL,
+	Hodnota       VARCHAR2(50) NOT NULL
+)
+;
+
+
+CREATE TABLE Parametry
+(
+	ID_Parametru  NUMBER(38) NOT NULL,
+	Nazev         VARCHAR2(50) NOT NULL
+)
+;
+
+
+CREATE TABLE Zbozi_skladu
+(
+	ID_Skladu  NUMBER(38) NOT NULL,
+	ID_Zbozi   NUMBER(38) NOT NULL,
+	Mnozstvi   NUMBER(8) NOT NULL,
+	Datum      DATE
+)
+;
+
+
+CREATE TABLE Zbozi
+(
+	ID_Zbozi   NUMBER(38) NOT NULL,
+	Cena       NUMBER(38) NOT NULL,
+	Nazev      VARCHAR2(50) NOT NULL,
+	Kategorie  VARCHAR2(50) NOT NULL,
+	Popis      VARCHAR2(50)
+)
+;
+
+
+CREATE TABLE Pozice
+(
+	ID_Pozice  NUMBER(38) NOT NULL,
+	Nazev      VARCHAR2(50) NOT NULL,
+	Popis      VARCHAR2(50)
+)
+;
+
+
+CREATE TABLE Zamestnanci
+(
+	ID_Zamestnance  NUMBER(38) NOT NULL,
+	Email           VARCHAR2(50),
+	Jmeno           VARCHAR2(50) NOT NULL,
+	Prijmeni        VARCHAR2(50) NOT NULL,
+	Telefon         VARCHAR2(20) NOT NULL,
+	Ulice           VARCHAR2(50),
+	Plat            NUMBER(8),
+	ID_Pozice       NUMBER(38),
+	ID_Skladu       NUMBER(38)
+)
+;
+
+
+CREATE TABLE Sklady
+(
+	ID_Skladu  NUMBER(38) NOT NULL,
+	Mesto      VARCHAR2(50) NOT NULL,
+	Kapacita   VARCHAR2(50)
+)
+;
+
+
+
+ALTER TABLE Parametry_zbozi ADD CONSTRAINT PK_Parametry_zbozi 
+	PRIMARY KEY (ID_Zbozi, ID_Parametru)
+;
+
+ALTER TABLE Parametry ADD CONSTRAINT PK_Parametry 
+	PRIMARY KEY (ID_Parametru)
+;
+
+ALTER TABLE Zbozi_skladu ADD CONSTRAINT PK_Zbozi_skladu 
+	PRIMARY KEY (ID_Skladu, ID_Zbozi)
+;
+
+ALTER TABLE Zbozi ADD CONSTRAINT PK_Zbozi 
+	PRIMARY KEY (ID_Zbozi)
+;
+
+ALTER TABLE Pozice ADD CONSTRAINT PK_Pozice 
+	PRIMARY KEY (ID_Pozice)
+;
+
+ALTER TABLE Zamestnanci ADD CONSTRAINT PK_Zamestnanci 
+	PRIMARY KEY (ID_Zamestnance)
+;
+
+ALTER TABLE Sklady ADD CONSTRAINT PK_Sklady 
+	PRIMARY KEY (ID_Skladu)
+;
+
+
+
+ALTER TABLE Parametry_zbozi ADD CONSTRAINT FK_Parametry_zbozi_Parametry 
+	FOREIGN KEY (ID_Parametru) REFERENCES Parametry (ID_Parametru)
+;
+
+ALTER TABLE Parametry_zbozi ADD CONSTRAINT FK_Parametry_zbozi_Zbozi 
+	FOREIGN KEY (ID_Zbozi) REFERENCES Zbozi (ID_Zbozi)
+;
+
+ALTER TABLE Zbozi_skladu ADD CONSTRAINT FK_Zbozi_skladu_Sklady 
+	FOREIGN KEY (ID_Skladu) REFERENCES Sklady (ID_Skladu)
+;
+
+ALTER TABLE Zbozi_skladu ADD CONSTRAINT FK_Zbozi_skladu_Zbozi 
+	FOREIGN KEY (ID_Zbozi) REFERENCES Zbozi (ID_Zbozi)
+;
+
+ALTER TABLE Zamestnanci ADD CONSTRAINT FK_Zamestnanci_Pozice 
+	FOREIGN KEY (ID_Pozice) REFERENCES Pozice (ID_Pozice)
+;
+
+ALTER TABLE Zamestnanci ADD CONSTRAINT FK_Zamestnanci_Sklady 
+	FOREIGN KEY (ID_Skladu) REFERENCES Sklady (ID_Skladu)
+;

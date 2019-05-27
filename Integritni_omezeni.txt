@@ -1,0 +1,70 @@
+-- Triviální integritní omezení
+
+-- Kontrola NULL hodnot se øeší v databázovém schématu
+
+-- Tabulka Zbozi - Cena nesmí být záporná hodnota
+
+ALTER TABLE Zbozi ADD CONSTRAINT chk_cena CHECK (cena >= 0);
+
+-- TABULKA Zbozi_skladu - Mnozstvi nesmí být záporné èíslo
+
+ALTER TABLE Zbozi_skladu ADD CONSTRAINT chk_mnozstvi CHECK (mnozstvi >= 0);
+
+-- TABULKA Zamestnanci - Plat nesmí být záporná hodnota
+
+ALTER TABLE Zamestnanci ADD CONSTRAINT chk_plat CHECK (plat >= 0);
+
+
+
+
+
+
+
+-- Netriviální integritní omezení
+
+-- Tabulka Parametry_zbozi - Pro jedno zboží by nemìlo existovat více stejných parametrù.
+
+CREATE OR REPLACE PROCEDURE kontrola_parametru_zbozi(ID_Zbozi IN NUMBER, ID_Param IN NUMBER) 
+AS
+any_rows_found NUMBER(3);
+BEGIN
+SELECT COUNT(*) into any_rows_found FROM parametry_zbozi p WHERE p.ID_Zbozi = ID_Zbozi AND p.ID_Parametru = ID_Param;
+IF any_rows_found > 0 THEN
+RAISE_APPLICATION_ERROR(20001, 'Neni mozne mit pro jedno zbozi vice stejnych parametru');
+END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER trig_parametry_zbozi
+BEFORE INSERT
+ON Parametry_zbozi
+FOR EACH ROW
+BEGIN
+kontrola_parametru_zbozi(:NEW.ID_Zbozi, :NEW.ID_Parametru);
+END;
+/
+
+
+-- Tabulka Zbozi_skladu - Jedno zbozí by nemìlo být na daném skladì registrováno vícekrát.
+
+CREATE OR REPLACE PROCEDURE kontrola_Zbozi_skladu(ID_Skladu IN NUMBER, ID_Zbozi IN NUMBER)
+AS
+any_rows_found NUMBER(3);
+BEGIN
+SELECT COUNT(*) INTO any_rows_found
+FROM zbozi_skladu zs
+WHERE zs.ID_Skladu = ID_Skladu AND zs.ID_Zbozi = ID_Zbozi;
+IF(any_rows_found != 0) THEN
+Raise_Application_error(20002, 'Zbozi je jiz na danem skladu, staci upravit mnzostvi');
+END IF;
+END;
+/
+
+
+CREATE OR REPLACE TRIGGER trig_zbozi_skladu
+BEFORE INSERT ON Zbozi_skladu
+FOR EACH ROW
+BEGIN
+kontrola_Zbozi_skladu(:new.ID_Skladu, :new.ID_Zbozi);
+END;
+/

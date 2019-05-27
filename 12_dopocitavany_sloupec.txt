@@ -1,0 +1,12 @@
+// Upraveni tabulky Sklady
+
+ALTER TABLE Zakaznik ADD cena_skladu NUMBER(38) DEFAULT null;
+
+
+CREATE OR REPLACE PROCEDURE Sklady_Cena
+AS
+Celek NUMBER(38);
+BEGIN
+UPDATE 
+
+END;
