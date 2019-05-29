@@ -1,0 +1,43 @@
+-- 1. pridej parametr zbozi
+
+SELECT * FROM Parametry_zbozi WHERE ID_Zbozi = 1;
+
+BEGIN
+	evidence_skladu_api.pridej_parametr_zbozi(1,2,'3kg');
+END;
+/
+
+SELECT * FROM Parametry_zbozi WHERE ID_Zbozi = 1;
+
+-- 2. vloz zbozi do skladu
+
+SELECT * FROM Zbozi_skladu WHERE ID_Skladu = 1;
+
+BEGIN
+	evidence_skladu_api.vloz_zbozi_skladu(10, 1, 2);
+END;
+/
+
+SELECT * FROM Zbozi_skladu WHERE ID_Skladu = 1;
+
+-- 3. uprava mnozstvi zbozi skladu
+
+SELECT * FROM Zbozi_skladu where ID_Skladu = 1 AND ID_Zbozi = 3;
+
+BEGIN
+	evidence_skladu_api.mnozstvi_zbozi_skladu(3, 1, -2);
+END;
+/
+
+SELECT * FROM Zbozi_skladu where ID_Skladu = 1 AND ID_Zbozi = 3;
+
+-- 4. pridani zamestnance
+
+SELECT * FROM Zamestnanci WHERE ID_Zamestnance = (SELECT MAX(ID_Zamestnance) FROM Zamestnanci);
+
+BEGIN
+	evidence_skladu_api.pridej_zamestnance('test@test.com','Karel','Lopatka','154 444 774','',25000, 4, 1);
+END;
+/
+
+SELECT * FROM Zamestnanci WHERE ID_Zamestnance = (SELECT MAX(ID_Zamestnance) FROM Zamestnanci);

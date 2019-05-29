@@ -1,12 +1,16 @@
-// Upraveni tabulky Sklady
+ALTER TABLE Sklady ADD Pocet_zamestnancu NUMBER(38) DEFAULT 0;
 
-ALTER TABLE Zakaznik ADD cena_skladu NUMBER(38) DEFAULT null;
-
-
-CREATE OR REPLACE PROCEDURE Sklady_Cena
+CREATE OR REPLACE PROCEDURE spocitej_zamestnance_skladu
 AS
-Celek NUMBER(38);
 BEGIN
-UPDATE 
-
+UPDATE Sklady s SET s.Pocet_zamestnancu = (SELECT COUNT(*) FROM Zamestnanci z WHERE z.ID_Skladu = s.ID_Skladu);
 END;
+/
+
+
+CREATE OR REPLACE TRIGGER trig_pocet_zamestnancu AFTER INSERT OR UPDATE OR DELETE
+ON Zamestnanci
+BEGIN
+spocitej_zamestnance_skladu;
+END;
+/

@@ -30,7 +30,7 @@ any_rows_found NUMBER(3);
 BEGIN
 SELECT COUNT(*) into any_rows_found FROM parametry_zbozi p WHERE p.ID_Zbozi = ID_Zbozi AND p.ID_Parametru = ID_Param;
 IF any_rows_found > 0 THEN
-RAISE_APPLICATION_ERROR(20001, 'Neni mozne mit pro jedno zbozi vice stejnych parametru');
+RAISE_APPLICATION_ERROR(-20001, 'Neni mozne mit pro jedno zbozi vice stejnych parametru');
 END IF;
 END;
 /
@@ -55,7 +55,7 @@ SELECT COUNT(*) INTO any_rows_found
 FROM zbozi_skladu zs
 WHERE zs.ID_Skladu = ID_Skladu AND zs.ID_Zbozi = ID_Zbozi;
 IF(any_rows_found != 0) THEN
-Raise_Application_error(20002, 'Zbozi je jiz na danem skladu, staci upravit mnzostvi');
+Raise_Application_error(-20002, 'Zbozi je jiz na danem skladu, staci upravit mnzostvi');
 END IF;
 END;
 /

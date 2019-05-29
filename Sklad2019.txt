@@ -10,7 +10,8 @@ CREATE TABLE Parametry_zbozi
 CREATE TABLE Parametry
 (
 	ID_Parametru  NUMBER(38) NOT NULL,
-	Nazev         VARCHAR2(50) NOT NULL
+	Nazev         VARCHAR2(50) NOT NULL,
+	Popis         VARCHAR2(50)
 )
 ;
 

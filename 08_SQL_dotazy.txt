@@ -20,7 +20,7 @@ FROM Zamestnanci z
 JOIN Pozice p ON z.ID_Pozice = p.ID_Pozice
 WHERE z.Plat is not null and z.Plat > (Select AVG(Plat) From Zamestnanci);
 
--- 2.2 Poèet zamìstnancù s vìtšším než prùmìrným platem
+-- 2.2 Poèet zamìstnancù s vìtším než prùmìrným platem
 
 SELECT COUNT(*) From zamestnanci where plat > (Select AVG(Plat) FROM Zamestnanci);
 

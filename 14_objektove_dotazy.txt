@@ -1,0 +1,56 @@
+-- 1. všechny zamìstnanci pracující v Hradci Králové
+
+SELECT *
+FROM obj_Zamestnanci z
+WHERE z.Sklady_ref.Mesto LIKE 'Hradec%';
+
+-- 2. Platový prùmìr všech zamìstnancù
+
+SELECT AVG(z.Plat)
+FROM obj_Zamestnanci z WHERE z.Plat IS NOT NULL;
+
+-- 2.1 Všechny zamìstnance a pozici s vìtším než prùmìrným platem
+
+SELECT z.ID_Zamestnance, z.Jmeno, z.Prijmeni, z.Plat, z.Pozice_ref.Nazev, z.Pozice_ref.Popis
+FROM obj_Zamestnanci z
+WHERE z.Plat IS NOT NULL AND z.Plat > (Select AVG(za.Plat) FROM obj_Zamestnanci za);
+
+-- 2.2 Poèet Zamìstnancù s vìtším než prùmìrným platem
+
+SELECT COUNT(*) 
+FROM obj_Zamestnanci z
+WHERE z.Plat > (SELECT AVG(za.Plat) FROM obj_Zamestnanci za);
+
+-- 3. Zboží, které je nejvícekrát ve skladu v Hradci Králové
+
+SELECT * FROM
+(SELECT z.Zbozi_ref.ID_Zbozi, z.Zbozi_ref.Cena, z.Zbozi_ref.Nazev, z.Zbozi_ref.Kategorie, z.Zbozi_ref.Popis FROM obj_Zbozi_Skladu z WHERE z.Sklady_ref.Mesto like 'Hradec%' ORDER BY z.Mnozstvi DESC)
+WHERE ROWNUM = 1;
+
+-- 4. Celková cena zboží ve skladu v Hradci Králové
+
+SELECT z.Sklady_ref.ID_Skladu, z.Sklady_ref.Mesto, SUM(z.Zbozi_ref.Cena * z.Mnozstvi) AS Celkova_hodnota_skladu
+FROM obj_Zbozi_skladu z
+WHERE z.Sklady_ref.Mesto like 'Hradec%'
+GROUP BY(z.Sklady_ref.ID_Skladu, z.Sklady_ref.Mesto);
+
+-- 4.1 Celková cena zboží z každého skladu
+
+SELECT z.Sklady_ref.ID_Skladu, z.Sklady_ref.Mesto, SUM(z.Zbozi_ref.Cena * z.Mnozstvi) AS Celkova_hodnota_skladu
+FROM obj_Zbozi_skladu z
+GROUP BY(z.Sklady_ref.ID_Skladu, z.Sklady_ref.Mesto)
+ORDER BY Celkova_hodnota_skladu;
+
+-- 4.2 Poèet skladù ve kterých není žádné zboží
+
+SELECT COUNT(*) FROM obj_Sklady s
+WHERE s.ID_Skladu NOT IN (SELECT z.Sklady_ref.ID_Skladu FROM obj_Zbozi_skladu z);
+
+-- 5 Zboží s nejvíce parametrama
+
+SELECT * FROM
+(SELECT COUNT(p.Parametry_ref.ID_Parametru) as pocet_parametru, p.Zbozi_ref.ID_Zbozi, p.Zbozi_ref.Nazev
+FROM obj_Parametry_zbozi p
+GROUP BY p.Zbozi_ref.ID_Zbozi, p.Zbozi_ref.Nazev
+ORDER BY COUNT(p.Parametry_ref.ID_Parametru) DESC)
+WHERE ROWNUM <=10;

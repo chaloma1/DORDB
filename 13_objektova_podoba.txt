@@ -1,0 +1,79 @@
+CREATE OR REPLACE TYPE t_Pozice AS OBJECT
+(
+	ID_Pozice 	NUMBER(38) NOT NULL,
+	Nazev 		VARCHAR2(50) NOT NULL,
+	Popis 		VARCHAR2(50)
+);
+/
+
+CREATE OR REPLACE TYPE t_Sklady AS OBJECT
+(
+	ID_Skladu 	NUMBER(38) NOT NULL,
+	Mesto 		VARCHAR2(50) NOT NULL,
+	Kapacita 	VARCHAR2(50)
+);
+/
+
+CREATE OR REPLACE TYPE t_Zamestnanci AS OBJECT
+(
+	ID_Zamestnance 	NUMBER(38) NOT NULL, 
+	Email		VARCHAR2(50),
+	Jmeno		VARCHAR2(50) NOT NULL,
+	Prijmeni	VARCHAR2(50) NOT NULL,
+	Telefon		VARCHAR2(20) NOT NULL,
+	Ulice		VARCHAR2(50),
+	Plat		NUMBER(8),
+	Pozice_ref REF t_Pozice,
+	Sklady_ref REF t_Sklady
+);
+/
+
+CREATE OR REPLACE TYPE t_Zbozi AS OBJECT
+(
+	ID_Zbozi	NUMBER(38) NOT NULL,
+	Cena		NUMBER(38) NOT NULL,
+	Nazev		VARCHAR2(50) NOT NULL,
+	Kategorie	VARCHAR2(50) NOT NULL,
+	Popis		VARCHAR2(50)
+);
+/
+
+CREATE OR REPLACE TYPE t_Zbozi_skladu AS OBJECT
+(
+	Sklady_ref REF t_Sklady NOT NULL,
+	Zbozi_ref REF t_Zbozi NOT NULL,
+	Mnozstvi	NUMBER(38) NOT NULL,
+	Datum		DATE
+);
+/
+
+CREATE OR REPLACE TYPE t_Parametry AS OBJECT
+(
+	ID_Parametru	NUMBER(38) NOT NULL,
+	Nazev		VARCHAR2(50)
+);
+
+CREATE OR REPLACE TYPE t_Parametry_zbozi AS OBJECT
+(
+	Zbozi_ref REF t_Zbozi NOT NULL,
+	Parametry_ref REF t_Parametry NOT NULL,
+	Hodnota		VARCHAR2(50) NOT NULL
+);
+/
+
+CREATE TABLE obj_Pozice of t_Pozice;
+CREATE TABLE obj_Sklady of t_Sklady;
+CREATE TABLE obj_Zamestnanci of t_Zamestnanci;
+CREATE TABLE obj_Zbozi of t_Zbozi;
+CREATE TABLE obj_Zbozi_skladu of t_Zbozi_skladu;
+CREATE TABLE obj_Parametry of t_Parametry;
+CREATE TABLE obj_Parametry_zbozi of t_Parametry_zbozi;
+
+
+INSERT INTO obj_Pozice SELECT * FROM Pozice;
+INSERT INTO obj_Sklady SELECT * FROM Sklady;
+INSERT INTO obj_Zamestnanci SELECT z.ID_Zamestnance, z.Email, z.Jmeno, z.Prijmeni, z.Telefon, z.Ulice, z.Plat, (SELECT REF(p) FROM obj_Pozice p WHERE p.ID_Pozice = z.ID_Pozice), (SELECT REF(s) FROM obj_Sklady s WHERE s.ID_Skladu = z.ID_Skladu) FROM Zamestnanci z;
+INSERT INTO obj_Zbozi SELECT * FROM Zbozi;
+INSERT INTO obj_Zbozi_skladu SELECT (SELECT REF(s) FROM obj_Sklady s WHERE s.ID_Skladu = zs.ID_Skladu), (SELECT REF(z) FROM obj_Zbozi z WHERE z.ID_Zbozi = zs.ID_Zbozi), zs.Mnozstvi, zs.Datum FROM Zbozi_skladu zs;
+INSERT INTO obj_Parametry SELECT * FROM Parametry;
+INSERT INTO obj_Parametry_zbozi SELECT (SELECT REF(z) FROM obj_Zbozi z WHERE z.ID_Zbozi = pz.ID_Zbozi), (SELECT REF(p) FROM obj_Parametry p WHERE p.ID_Parametru = pz.ID_Parametru), pz.Hodnota FROM Parametry_zbozi pz;

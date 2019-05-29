@@ -1,0 +1,33 @@
+CREATE OR REPLACE PACKAGE evidence_skladu_api AS
+	PROCEDURE pridej_parametr_zbozi(n_ID_Zbozi IN NUMBER, n_ID_Parametru IN NUMBER, Hodnota_parametru IN VARCHAR);
+	PROCEDURE vloz_zbozi_skladu(n_ID_Zbozi IN NUMBER, n_ID_Skladu IN NUMBER, Mnozstvi_zbozi IN NUMBER);
+	PROCEDURE mnozstvi_zbozi_skladu(n_ID_Zbozi IN NUMBER, n_ID_Skladu IN NUMBER, Zmena_mnozstvi IN NUMBER);
+	PROCEDURE pridej_zamestnance(n_Email IN VARCHAR, n_Jmeno IN VARCHAR, n_Prijmeni IN VARCHAR, n_Telefon IN VARCHAR, n_Ulice IN VARCHAR, n_Plat IN NUMBER, n_ID_Pozice IN NUMBER, n_ID_Skladu IN NUMBER);
+END evidence_skladu_api;
+/
+
+CREATE OR REPLACE PACKAGE BODY evidence_skladu_api AS
+	PROCEDURE pridej_parametr_zbozi(n_ID_Zbozi IN NUMBER, n_ID_Parametru IN NUMBER, Hodnota_parametru IN VARCHAR) AS
+		BEGIN
+			INSERT INTO Parametry_zbozi(ID_Zbozi, ID_Parametru, Hodnota) values (n_ID_Zbozi, n_ID_Parametru, Hodnota_parametru);
+		END pridej_parametr_zbozi;
+
+	PROCEDURE vloz_zbozi_skladu(n_ID_Zbozi IN NUMBER, n_ID_Skladu IN NUMBER, Mnozstvi_zbozi IN NUMBER) AS
+		BEGIN
+			INSERT INTO Zbozi_skladu(ID_Zbozi, ID_Skladu, Mnozstvi) values (n_ID_Zbozi, n_ID_Skladu, Mnozstvi_zbozi);
+		END vloz_zbozi_skladu;
+	PROCEDURE mnozstvi_zbozi_skladu(n_ID_Zbozi IN NUMBER, n_ID_Skladu IN NUMBER, Zmena_mnozstvi IN NUMBER) AS
+		any_rows_found NUMBER DEFAULT 0;
+		BEGIN
+			SELECT COUNT(*) INTO any_rows_found FROM Zbozi_skladu WHERE ID_Zbozi = n_ID_Zbozi AND ID_Skladu = n_ID_Skladu;
+			IF(any_rows_found > 0) THEN
+			UPDATE Zbozi_skladu SET Mnozstvi = Mnozstvi + Zmena_mnozstvi WHERE ID_Zbozi = n_ID_Zbozi AND ID_Skladu = n_ID_Skladu;
+			ELSE RAISE_APPLICATION_ERROR(-20003, 'Nenalezen zadny zaznam pro aktualizaci');
+			END IF;
+		END mnozstvi_zbozi_skladu;
+	PROCEDURE pridej_zamestnance(n_Email IN VARCHAR, n_Jmeno IN VARCHAR, n_Prijmeni IN VARCHAR, n_Telefon IN VARCHAR, n_Ulice IN VARCHAR, n_Plat IN NUMBER, n_ID_Pozice IN NUMBER, n_ID_Skladu IN NUMBER) AS
+		BEGIN
+			INSERT INTO Zamestnanci(Email, Jmeno, Prijmeni, Telefon, Ulice, Plat, ID_Pozice, ID_Skladu) values (n_Email, n_Jmeno, n_Prijmeni, n_Telefon, n_Ulice, n_Plat, n_ID_Pozice, n_ID_Skladu);
+		END pridej_zamestnance;
+END evidence_skladu_api;
+/
